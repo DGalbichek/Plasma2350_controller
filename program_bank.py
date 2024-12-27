@@ -6,6 +6,12 @@ from abstract import Colour, Program, Scene
 from grid66 import green_pine_image, blank_image
 
 
+class BlankScene(Scene):
+    def next_frame(self, strip):
+        for i in range(66):
+            strip.set_hsv(i, 0, 1.0, 0)
+
+
 class Pulsar(object):
     def __init__(self, lifespan=1, stepper = 0.1):
         self.intensity = 0.1
@@ -127,29 +133,60 @@ class ThereAndBackScene(Scene):
 
 
 PROGRAM_BANK = [
-    Program([{'scene': MarchingScene, 'duration': 0.5, 'params': {'colour': rgb_colours.RGB_DARKORANGE, 'gap': 5}}]),
+    Program([{'scene': ThereAndBackScene,
+              'duration': 5,
+              'frameduration': 0.05},
+              {'scene': BlankScene,
+               'duration': 0.01,
+               'frameduration': 0},
+              {'scene': BlankScene,
+               'duration': 1,
+               'frameduration': 2},
+              {'scene': PulsarsScene,
+              'duration': 20,
+              'frameduration': 0.1,
+              'params': {'colour': rgb_colours.RGB_DARKORANGE}},
+              {'scene': RainbowScene,
+              'duration': 15,
+              'frameduration': 0,
+              'params': {'intensity': 1.0}}, ]),
+    Program([{'scene': MarchingScene,
+              'duration': 0,
+              'frameduration': 1,
+              'params': {'colour': rgb_colours.RGB_DARKORANGE, 'gap': 5}}]),
+    Program([{'scene': LonelyPulsarScene,
+              'duration': 0,
+              'frameduration': 0.1,
+              'params': {'colour': rgb_colours.RGB_DARKORANGE}}]),
+    Program([{'scene': PulsarsScene,
+              'duration': 0,
+              'frameduration': 0.2,
+              'params': {'colour': rgb_colours.RGB_DARKORANGE}}]),
+    Program([{'scene': RainbowScene,
+              'duration': 0,
+              'frameduration': 0,
+              'params': {'intensity': 1.0}}]),
+    Program([{'scene': ThereAndBackScene,
+              'duration': 0,
+              'frameduration': 0.05}]),
+]
+
+'''not_in_use = [
+    Program([
+        {'scene': green_pine_image, 'duration': 2},
+        {'scene': blank_image, 'duration': 2},
+    ]),
     #Program([{'scene': MarchingScene, 'duration': 0.5, 'params': {'colour': rgb_colours.RGB_PINK, 'gap': 4}}]),
     #Program([{'scene': MarchingScene, 'duration': 0.5, 'params': {'colour': rgb_colours.RGB_DARKORANGE}}]),
-    Program([{'scene': LonelyPulsarScene, 'duration': 0.1, 'params': {'colour': rgb_colours.RGB_DARKORANGE}}]),
     #Program([{'scene': LonelyPulsarScene, 'duration': 0.1}]),
-    Program([{'scene': PulsarsScene, 'duration': 0.2, 'params': {'colour': rgb_colours.RGB_DARKORANGE}}]),
     #Program([{'scene': PulsarsScene, 'duration': 0.2}]),
     #Program([{'scene': SparkleScene, 'duration': 0}]),
     #Program([{'scene': SparkleScene, 'duration': 0, 'params': {'colour': rgb_colours.RGB_YELLOW}}]),
     #Program([{'scene': SparkleScene, 'duration': 0, 'params': {'colour': rgb_colours.RGB_DARKORANGE}}]),
     #Program([{'scene': SparkleScene, 'duration': 0, 'params': {'colour': rgb_colours.RGB_DARKGREEN}}]),
-    Program([{'scene': RainbowScene, 'duration': 0, 'params': {'intensity': 1.0}}]),
-    Program([{'scene': RainbowScene, 'duration': 0, 'params': {'intensity': 0.66}}]),
-    Program([{'scene': RainbowScene, 'duration': 0, 'params': {'intensity': 0.33}}]),
     #Program([{'scene': ThereAndBackScene, 'duration': 0.2}]),
     #Program([{'scene': ThereAndBackScene, 'duration': 0.15}]),
     #Program([{'scene': ThereAndBackScene, 'duration': 0.1}]),
-    Program([{'scene': ThereAndBackScene, 'duration': 0.05}]),
-]
-
-not_in_use = [
-    Program([
-        {'scene': green_pine_image, 'duration': 2},
-        {'scene': blank_image, 'duration': 2},
-    ]),
-]
+    Program([{'scene': RainbowScene, 'duration': 0, 'params': {'intensity': 0.66}}]),
+    Program([{'scene': RainbowScene, 'duration': 0, 'params': {'intensity': 0.33}}]),
+]'''

@@ -40,7 +40,7 @@ class Scene(object):
 
 
 class ProgramStep(object):
-    def __init__(self, scene, duration, params={}):
+    def __init__(self, scene, duration, frameduration, params={}):
         if type(scene) == type:
             if params:
                 self.scene = scene(**params)
@@ -49,28 +49,31 @@ class ProgramStep(object):
         else:
             self.scene = scene
         self.duration = duration
+        self.frameduration = frameduration
 
 
 class Program(object):
     def __init__(self, steps):
         self.steps = steps
         self.current_step = {}
-        self.nstep = 999
+        self.nstep = 0
+        self.in_frame_since = 999
         self.in_step_since = 999
 
-    def start(self):
-        self.current_step = ProgramStep(**self.steps[0])
-        self.step = 0
-        self.in_step_since = utime.time_ns()
+    def start(self, n=0):
+        self.current_step = ProgramStep(**self.steps[n])
+        self.nstep = n
+        self.in_frame_since = utime.time_ns()
+        self.in_step_since = self.in_frame_since
 
     def tick(self, led_strip):
         t = utime.time_ns()
-        elapsed = (t - self.in_step_since) / 10 ** 9
-        #print(t, self.in_step_since, elapsed)
-        if self.current_step.duration == 0 or elapsed >= self.current_step.duration:
-            if len(self.steps) > 1:
-                self.nstep = (self.nstep + 1) % len(self.steps)
-                self.current_step = ProgramStep(**self.steps[self.nstep])
-            self.in_step_since = utime.time_ns()
+        if len(self.steps) > 1 and self.current_step.duration > 0:
+            elapsed = (t - self.in_step_since) / 10 ** 9
+            if elapsed >= self.current_step.duration:
+                self.start((self.nstep + 1) % len(self.steps))
 
+        elapsed = (t - self.in_frame_since) / 10 ** 9
+        if self.current_step.frameduration == 0 or elapsed >= self.current_step.frameduration:
             self.current_step.scene.next_frame(led_strip)
+            self.in_frame_since = utime.time_ns()
